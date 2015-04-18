@@ -202,84 +202,24 @@ class DecisionTree:
 		else:
 			return self.predict_helper(current_node.getRight(), data)
 
-	def getInOrderTraversal(self):
-		self.inOrder = []
-		self.inOrderHelper(self.root)
-
-	def inOrderHelper(self, current_node):
-		if current_node is None:
-			return
-		else:
-			self.inOrderHelper(current_node.getLeft())
-			self.inOrder.append(current_node)
-			self.inOrderHelper(current_node.getRight())
-
-	def getPostOrderTraversal(self):
-		self.postOrder = []
-		self.postOrderHelper(self.root)
-
-	def postOrderHelper(self, current_node):
-		if current_node is None:
-			return
-		else:
-			self.postOrderHelper(current_node.getLeft())
-			self.postOrderHelper(current_node.getRight())
-			self.postOrder.append(current_node)
-
-	def export(self):
-		f = open('savedTree.txt', 'wb')
-		for i in range(len(self.inOrder)):
-			current_node = self.inOrder[i]
-			if current_node.isLeaf() == False:
-				splitRule = current_node.getRule()
-				splitFeature = splitRule[0]
-				f.write("%d " % splitFeature)
-			else:
-				label = current_node.getLabel()
-				if label == 1:
-					f.write("Win ")
-				else:
-					f.write("Lose ")
-		f.write('\n')
-
-		for i in range(len(self.postOrder)):
-			current_node = self.postOrder[i]
-			if current_node.isLeaf() == False:
-				splitRule = current_node.getRule()
-				splitFeature = splitRule[0]
-				f.write("%d " % splitFeature)
-			else:
-				label = current_node.getLabel()
-				if label == 1:
-					f.write("Win ")
-				else:
-					f.write("Lose ")
-
-		f.close()
-
 
 def main():
 	mat = scipy.io.loadmat(sys.argv[1])
 	trainingData = mat['trainingData']
 	trainingLabels = mat['trainingLabels'][0]
 
-
 	classifier = DecisionTree(maxDepth, impurity, segmentor)
 	classifier.train(trainingData, trainingLabels)
 
-	#classifier.getInOrderTraversal()
-	#classifier.getPostOrderTraversal()
-
-	#classifier.export()
-
 	testData = scipy.io.loadmat(sys.argv[2])
+	testData = testData['testData']
 	predictions = classifier.predict(testData)
 
 	f = open('DecisionTreePredictions.csv', 'wb')
 	writer = csv.writer(f)
 	writer.writerow(['Team Comp Number', 'Result'])
 	for i in range(len(predictions)):
-		if predictions[i] == 1
+		if predictions[i] == 1:
 			writer.writerow([i+1, "Win"])
 		else:
 			writer.writerow([i+1, "Loss"])
